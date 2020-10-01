@@ -72,9 +72,9 @@ def operador_controlado(V):
     #A
     circuito.ry(gamma/2, 1)
     circuito.rz(beta, 1)
-    circuito.draw()
     #Operador [[1,0],[0,e**(1j*alpha)]] -> U3=0,0,alpha
     circuito.u3(theta=0, phi=0, lam=alpha, qubit=0)
+    circuito.draw()
     return circuito
 
 
@@ -107,12 +107,66 @@ def inicializa_3qubits(vetor_dimensao8):
     '''
     Lab2 - questão 4
     '''
+    arrays = np.split(vetor_dimensao8, 4)
 
-    circuito = qiskit.QuantumCircuit(3)
+    #Arvore de Estados
+    aux_l = np.empty((4))
 
+    i=0
+    for array in arrays:
+        aux_l[i] = np.linalg.norm(array)
+        i+= 1
+
+    i=0
+    s_aux_l = np.empty((2))
+    s_arrays = np.split(aux_l, 2)
+    for s_array in s_arrays: 
+        s_aux_l[i] = np.linalg.norm(s_array)
+        i+=1
+
+    t_aux_l = np.linalg.norm(s_aux_l)
+
+    #Definindo os alphas
+    alpha0 = 2*np.arcsin(np.sqrt(s_aux_l[1])/np.sqrt(t_aux_l))
+
+    alpha1 = 2*np.arcsin(np.sqrt(aux_l[1])/np.sqrt(s_aux_l[0]))
+    alpha2 = 2*np.arcsin(np.sqrt(aux_l[3])/np.sqrt(s_aux_l[1]))
+
+    alpha3 = 2*np.arcsin(np.sqrt(vetor_dimensao8[1])/np.sqrt(aux_l[0]))
+    alpha4 = 2*np.arcsin(np.sqrt(vetor_dimensao8[3])/np.sqrt(aux_l[1]))
+    alpha5 = 2*np.arcsin(np.sqrt(vetor_dimensao8[5])/np.sqrt(aux_l[2]))
+    alpha6 = 2*np.arcsin(np.sqrt(vetor_dimensao8[7])/np.sqrt(aux_l[3]))
+
+    #Circuito
+    
+    qr = qiskit.QuantumRegister(3, 'q')
+    circuito = qiskit.QuantumCircuit(qr)
+    
     # ------------------------
     # Seu código aqui
     # ------------------------
+
+    circuito.ry(alpha0,qr[0])
+    
+    circuito.x(qr[0])
+    circuito.cry(alpha1,qr[0],qr[1]) #if bit[0] = 0 faz o controle no bit[1]
+    
+    circuito.x(qr[0])
+    circuito.cry(alpha2,qr[0],qr[1]) #if bit[0] = 1 faz o controle no bit[1]
+    
+    circuito.x(qr[1])
+    circuito.x(qr[0])
+    circuito.mcry(theta=alpha3, q_controls=qr[0:2], q_target=qr[2], mode='noancilla',q_ancillae=None) #multi control bit; if bit[0] e bit[1] ambos são 0, entao faz o ry no bit 2
+    
+    circuito.x(qr[1])
+    circuito.mcry(theta=alpha4, q_controls=qr[0:2], q_target=qr[2], mode='noancilla',q_ancillae=None) #multi control bit; if bit[0]=0 e bit[1]=1 entao faz o ry no bit 2
+
+    circuito.x(qr[0])
+    circuito.x(qr[1])
+    circuito.mcry(theta=alpha5, q_controls=qr[0:2], q_target=qr[2], mode='noancilla',q_ancillae=None) #multi control bit; if bit[0]=1 e bit[1]=0 entao faz o ry no bit 2
+
+    circuito.x(qr[1])
+    circuito.mcry(theta=alpha6, q_controls=qr[0:2], q_target=qr[2], mode='noancilla',q_ancillae=None) #multi control bit; if bit[0]=1 e bit[1]=1 entao faz o ry no bit 2
 
     return circuito
 
@@ -123,3 +177,7 @@ def inicializa(vetor):
     circuito = qiskit.QuantumCircuit()
 
     return circuito
+
+#v8D = np.array([np.sqrt(0.03),np.sqrt(0.07),np.sqrt(0.15),np.sqrt(0.05),np.sqrt(0.1),np.sqrt(0.3),np.sqrt(0.2),np.sqrt(0.1)])
+#circuito = inicializa_3qubits(v8D)
+#print(circuito.draw())
