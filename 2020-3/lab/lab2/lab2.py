@@ -190,7 +190,10 @@ def inicializa(vetor):
     circuito = qiskit.QuantumCircuit()
 
     return circuito
+<<<<<<< HEAD
 
 v8D = np.array([np.sqrt(0.03),np.sqrt(0.07),np.sqrt(0.15),np.sqrt(0.05),np.sqrt(0.1),np.sqrt(0.3),np.sqrt(0.2),np.sqrt(0.1)])
 circuito = inicializa_3qubits(v8D)
 print(circuito.draw())
+=======
+>>>>>>> be5075d2ab00647814d35b926fe355857ef57097
