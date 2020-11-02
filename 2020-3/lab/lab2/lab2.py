@@ -94,18 +94,29 @@ def toffoli():
     #------------------------
     # Seu código aqui
     # ------------------------
-    circuito.cu1(np.pi, controles[1], alvo)
-    circuito.cx(controles[0],controles[1])
-    circuito.cu1(-np.pi, controles[1], alvo)
-    circuito.cx(controles[0],controles[1])
-    circuito.cu1(np.pi,controles[0],alvo)
-    circuito.draw()
     
+    circuito.h(alvo)
+    circuito.cx(controles[1], alvo)
+    circuito.tdg(alvo)
+    circuito.cx(controles[0], alvo)
+    circuito.t(alvo)
+    circuito.cx(controles[1], alvo)
+    circuito.tdg(alvo)
+    circuito.cx(controles[0], alvo)
+    circuito.t(controles[1])
+    circuito.t(alvo)
+    circuito.h(alvo)
+    circuito.cx(controles[0], controles[1])
+    circuito.t(controles[0])
+    circuito.tdg(controles[1])
+    circuito.cx(controles[0], controles[1])
+
     return circuito
 
 def inicializa_3qubits(vetor_dimensao8):
     '''
     Lab2 - questão 4
+    #https://qiskit.org/documentation/stubs/qiskit.circuit.QuantumCircuit.html - > ry, cry, mcry
     '''
     arrays = np.split(vetor_dimensao8, 4)
 
@@ -127,15 +138,17 @@ def inicializa_3qubits(vetor_dimensao8):
     t_aux_l = np.linalg.norm(s_aux_l)
 
     #Definindo os alphas
-    alpha0 = 2*np.arcsin(np.sqrt(s_aux_l[1])/np.sqrt(t_aux_l))
+    
+    alpha0 = 2*np.arcsin((s_aux_l[1])/np.sqrt(t_aux_l))
 
-    alpha1 = 2*np.arcsin(np.sqrt(aux_l[1])/np.sqrt(s_aux_l[0]))
-    alpha2 = 2*np.arcsin(np.sqrt(aux_l[3])/np.sqrt(s_aux_l[1]))
+    alpha1 = 2*np.arcsin((aux_l[1])/(s_aux_l[0]))
+    alpha2 = 2*np.arcsin((aux_l[3])/(s_aux_l[1]))
 
-    alpha3 = 2*np.arcsin(np.sqrt(vetor_dimensao8[1])/np.sqrt(aux_l[0]))
-    alpha4 = 2*np.arcsin(np.sqrt(vetor_dimensao8[3])/np.sqrt(aux_l[1]))
-    alpha5 = 2*np.arcsin(np.sqrt(vetor_dimensao8[5])/np.sqrt(aux_l[2]))
-    alpha6 = 2*np.arcsin(np.sqrt(vetor_dimensao8[7])/np.sqrt(aux_l[3]))
+    alpha3 = 2*np.arcsin((vetor_dimensao8[1])/(aux_l[0]))
+    alpha4 = 2*np.arcsin((vetor_dimensao8[3])/(aux_l[1]))
+    alpha5 = 2*np.arcsin((vetor_dimensao8[5])/(aux_l[2]))
+    alpha6 = 2*np.arcsin((vetor_dimensao8[7])/(aux_l[3]))
+    print("Alpha6: ", alpha6)
 
     #Circuito
     
@@ -178,6 +191,6 @@ def inicializa(vetor):
 
     return circuito
 
-#v8D = np.array([np.sqrt(0.03),np.sqrt(0.07),np.sqrt(0.15),np.sqrt(0.05),np.sqrt(0.1),np.sqrt(0.3),np.sqrt(0.2),np.sqrt(0.1)])
-#circuito = inicializa_3qubits(v8D)
-#print(circuito.draw())
+v8D = np.array([np.sqrt(0.03),np.sqrt(0.07),np.sqrt(0.15),np.sqrt(0.05),np.sqrt(0.1),np.sqrt(0.3),np.sqrt(0.2),np.sqrt(0.1)])
+circuito = inicializa_3qubits(v8D)
+print(circuito.draw())
